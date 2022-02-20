@@ -1,0 +1,30 @@
+Notes for creating chrome extension for Russian pronunciation
+
+It looks like I will be able to use the wiktionary API
+
+	- API queries will be of this form:
+	https://en.wiktionary.org/w/api.php?action=parse&format=json&page=обычно
+
+	or alternatively, if I'm forced to url-encode
+
+	https://en.wiktionary.org/w/api.php?action=parse&format=json&page=%D0%BE%D0%B1%D1%8B%D1%87%D0%BD%D0%BE
+
+The response will include a "text" object with one property: "*". The value of this property is a plain-text (string) dump of the page's main html for the content of the page. It is this section that I will have to parse.
+
+The API also returns two other objects that might be helpful:
+
+	1. an "images" array, that unintuitively contains the relative file name for audio files (eg: images: ["Ru-обычно.ogg"])
+
+		- the file itself can then be found by parsing the webpage at: https://commons.wikimedia.org/wiki/File:Ru-обычно.ogg
+			- of course, the file name on the end is replaced with the file that you are searcing for
+
+		- Alternatively, the url for the file can be found within the the main "text" object. However, this location is url-encoded. For example: src="//upload.wikimedia.org/wikipedia/commons/f/f3/Ru-%D0%BE%D0%B1%D1%8B%D1%87%D0%BD%D0%BE.ogg" in a <source> tag
+			- this is an ogg file but there is also a link to a transcoded mp3, if needed
+				- at least for обычно
+			- this should be the first approach!!! should be simpler
+
+
+	2. a "sections" array which contains the entries in the table of contents at the top of the page. this should be used to determine if the word is available in a certain language, as well as if it has a pronunciation section.
+		- the title of the section is described in the "line" property of each object in the array. The value of the line property could be "Russian" or "Pronunciation" for example.
+			- for edge cases, there are also different level properties, with language names being on level "2" and Pronunciation on level "3"
+
