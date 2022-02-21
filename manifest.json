@@ -3,11 +3,19 @@
   "description": "show IPA and audio pronunciation for selected words (source: wiktionary)",
   "version": "1.0",
   "manifest_version": 3,
+
+  "content_scripts": [
+    {
+      "js": ["main.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": [],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
